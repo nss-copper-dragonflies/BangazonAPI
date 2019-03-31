@@ -59,15 +59,57 @@ namespace BangazonAPI.Controllers
 
         // GET: api/PaymentType/5
         [HttpGet("{id}", Name = "GetPaymentTypes")]
-        public string Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            return "value";
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"Select id, [name], AcctNumber, CustomerId 
+                                        from PaymentType 
+                                        where id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    PaymentType specific_PaymentType = null;
+
+                    if (reader.Read())
+                    {
+                        specific_PaymentType = new PaymentType
+                        {
+                            id = reader.GetInt32(reader.GetOrdinal("id")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            AcctNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
+                            CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                        };
+                    }
+                    reader.Close();
+                    return Ok(specific_PaymentType);
+                }
+            }
         }
 
         // POST: api/PaymentType
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] PaymentType paymentType)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO PaymentType ([Name], AcctNumber, CustomerId)
+                                        OUTPUT INSERTED.id
+                                        Values ('Venmo', 9107, 1)";
+                    cmd.ExecuteNonQuery();
+
+                    int newId = (int)cmd.ExecuteScalar();
+                    paymentType.id = newId;
+                    return CreatedAtRoute(new { id = newId }, paymentType);
+                }
+
+            }
         }
 
         // PUT: api/PaymentType/5
