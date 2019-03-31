@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
+//JORDAN ROSAS: PaymentType Controller. This method will have the HTTP methods to get post put and delete data 
+
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -111,12 +113,41 @@ namespace BangazonAPI.Controllers
 
             }
         }
-
         // PUT: api/PaymentType/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(int id, [FromBody] PaymentType paymentType)
         {
-        }
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE PaymentType
+                                        SET AcctNumber =  @acctNumber,
+                                            Name = @name,
+                                        WHERE id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@acctNumber", paymentType.AcctNumber));
+                        cmd.Parameters.Add(new SqlParameter("@name", paymentType.Name));
+                        cmd.Parameters.Add(new SqlParameter("@id", paymentType.id));
+
+                        int rowsEffected = cmd.ExecuteNonQuery();
+                        if (rowsEffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows Effected");
+
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
+        }   
+
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
