@@ -103,7 +103,7 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"INSERT INTO PaymentType ([Name], AcctNumber, CustomerId)
                                         OUTPUT INSERTED.id
-                                        Values ('@name', @AcctNumber, @CustomerId)";
+                                        Values (@name, @AcctNumber, @CustomerId)";
                     cmd.Parameters.Add(new SqlParameter("@name", paymentType.Name));
                     cmd.Parameters.Add(new SqlParameter("@AcctNumber", paymentType.AcctNumber));
                     cmd.Parameters.Add(new SqlParameter("@CustomerId", paymentType.CustomerId));
