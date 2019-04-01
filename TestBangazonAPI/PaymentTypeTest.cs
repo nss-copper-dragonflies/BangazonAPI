@@ -60,7 +60,7 @@ namespace PaymentTypeTest.Tests
                 var specific_PT_res = JsonConvert.DeserializeObject<PaymentType>(responseBody);
 
                 Assert.Equal(HttpStatusCode.OK, specific_PT.StatusCode);
-                Assert.Equal("Visa", specific_PT_res.Name);
+                Assert.Equal("venmo", specific_PT_res.Name);
             }
         }
         //Testing a Post/Creating a new Payment type 
@@ -134,6 +134,30 @@ namespace PaymentTypeTest.Tests
 
                 Assert.Equal(HttpStatusCode.OK, getPaymentType.StatusCode);
                 Assert.Equal(newCustomerId, newPaymentType.CustomerId);
+            }
+        }
+        [Fact]
+        public async Task Delete_payment_type()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                // Use the client to send the request and store the response
+                var response = await client.DeleteAsync("/api/PaymentType/6");
+
+                // Store the JSON body of the response
+                string responseBody = await response.Content.ReadAsStringAsync();
+
+                /* ASSERT */
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+                var getPaymentType = await client.GetAsync("/api/PaymentType/6");
+                getPaymentType.EnsureSuccessStatusCode();
+
+                string getPaymentTypeBody = await getPaymentType.Content.ReadAsStringAsync();
+                PaymentType newPaymentType = JsonConvert.DeserializeObject<PaymentType>(getPaymentTypeBody);
+
+                Assert.Equal(HttpStatusCode.NoContent, getPaymentType.StatusCode);
             }
         }
     }

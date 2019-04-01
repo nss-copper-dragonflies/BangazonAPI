@@ -125,11 +125,12 @@ namespace BangazonAPI.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"UPDATE PaymentType
-                                        SET AcctNumber =  @acctNumber,
+                                            SET 
+                                            AcctNumber =  @acctNumber,
                                             Name = @name,
                                             customerId = @customerId
                                         WHERE id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@@customerId", paymentType.CustomerId));
+                        cmd.Parameters.Add(new SqlParameter("@customerId", paymentType.CustomerId));
                         cmd.Parameters.Add(new SqlParameter("@acctNumber", paymentType.AcctNumber));
                         cmd.Parameters.Add(new SqlParameter("@name", paymentType.Name));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -158,6 +159,12 @@ namespace BangazonAPI.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+            }
+
+
         }
 
 
