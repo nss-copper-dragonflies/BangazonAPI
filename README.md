@@ -10,6 +10,9 @@ and most powerful commericial platform for individuals all around the globe.
 - Write specific controllers building out our API's
 - Learn to be part of a development team
 
+## Customer Resource
+- Author: Brittany Ramos-Janeway
+- Responsible for the integration tests, controller, and creating the Customer class
 
 ## Technologies Used To Build This Application
 - C#
