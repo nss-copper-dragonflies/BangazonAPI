@@ -53,14 +53,15 @@ namespace PaymentTypeTest.Tests
             using (var client = new APIClientProvider().Client)
             {
                 //going to api/PaymentTypes/1 - targeting a specific PaymentType Obj in the DB
-                var specific_PT = await client.GetAsync("api/PaymentType/1");
+                var specific_PT = await client.GetAsync("api/PaymentType/3");
                 //wait until specific_PT is complete then read that response as a string
                 string responseBody = await specific_PT.Content.ReadAsStringAsync();
                 //Then we convert the json into something that C# can read and create a list of all of the payment types
                 var specific_PT_res = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+                
 
                 Assert.Equal(HttpStatusCode.OK, specific_PT.StatusCode);
-                Assert.Equal("venmo", specific_PT_res.Name);
+                Assert.Equal("Mastercard", specific_PT_res.Name);
             }
         }
         //Testing a Post/Creating a new Payment type 
@@ -103,37 +104,70 @@ namespace PaymentTypeTest.Tests
         [Fact]
         public async Task Update_Existing_Payment_Type()
         {
-            int newCustomerId = 5;
-
             using (var client = new APIClientProvider().Client)
             {
-                PaymentType modifiedPaymentType = new PaymentType
-                {
-                    Name = "venmo",
-                    AcctNumber = 1234,
-                    CustomerId = newCustomerId
-                };
-                var modifiedPaymentTypeAsJSON = JsonConvert.SerializeObject(modifiedPaymentType);
+                //==========GET a list of all the payment types 
 
+                //going to api/payment types
+                var paymentTypeResponse = await client.GetAsync("api/PaymentType");
+                
+                string responseBody = await paymentTypeResponse.Content.ReadAsStringAsync();
+                //Then we convert the json into something that C# can read and create a list of all of the payment types
+                var paymentTypeList = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
+                //Asserting/promising that that the status code should be 200 
+                Assert.Equal(HttpStatusCode.OK, paymentTypeResponse.StatusCode);
+                //Asserting that the list will have more items than 0 in it.
+
+                //selecting the first PaymentType object in the list using [0]
+                var PaymentTypeObj = paymentTypeList[0];
+
+                //assigned default value of the account number for later
+                var defaultAcctNumber = PaymentTypeObj.AcctNumber;
+
+                //modify the Acctnumber of the selected object
+                PaymentTypeObj.AcctNumber = 1111;
+
+                //Serialize the C# object into JSON object 
+                var paymentTypeJson = JsonConvert.SerializeObject(PaymentTypeObj);
+
+                //need to use the client to send the request and store the response
                 var response = await client.PutAsync(
                     "/api/PaymentType/1",
-                    new StringContent(modifiedPaymentTypeAsJSON, Encoding.UTF8, "application/json")
+                    new StringContent(paymentTypeJson, Encoding.UTF8, "application/json")
                 );
-                string responseBody = await response.Content.ReadAsStringAsync();
+                string newModifiedObjBody = await response.Content.ReadAsStringAsync();
+
+                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+                
+                //Get by id to verify the value was changed
+
+                //going to api/PaymentTypes/1 - targeting a specific PaymentType Obj in the DB
+                var specific_PT = await client.GetAsync("api/PaymentType/1");
+                //wait until specific_PT is complete then read that response as a string
+                string modPaymentTypeRespinseBody = await specific_PT.Content.ReadAsStringAsync();
+                //Then we convert the json into something that C# can read and create a list of all of the payment types
+                var specific_PT_res = JsonConvert.DeserializeObject<PaymentType>(modPaymentTypeRespinseBody);
+
+                Assert.Equal(HttpStatusCode.OK, specific_PT.StatusCode);
+                Assert.Equal(1111, specific_PT_res.AcctNumber);
+
+                //set obj back to original value by doing another put
+                specific_PT_res.AcctNumber = defaultAcctNumber;
+                var originalPaymentTypeJson = JsonConvert.SerializeObject(PaymentTypeObj);
+
+                //need to use the client to send the request and store the response
+                var originalResponse = await client.PutAsync(
+                    "/api/PaymentType/1",
+                    new StringContent(paymentTypeJson, Encoding.UTF8, "application/json")
+                );
+                string originalPaymentTypeObject = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-                /*========================================================
-                 * Get to verify the put was successful
-                 ========================================================*/
-                var getPaymentType = await client.GetAsync("/api/PaymentType/1");
-                getPaymentType.EnsureSuccessStatusCode();
 
-                string getPaymentTypeBody = await getPaymentType.Content.ReadAsStringAsync();
-                var newPaymentType = JsonConvert.DeserializeObject<PaymentType>(getPaymentTypeBody);
 
-                Assert.Equal(HttpStatusCode.OK, getPaymentType.StatusCode);
-                Assert.Equal(newCustomerId, newPaymentType.CustomerId);
+
+
             }
         }
         [Fact]
