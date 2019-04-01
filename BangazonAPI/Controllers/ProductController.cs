@@ -74,7 +74,7 @@ namespace BangazonAPI.Controllers
         // GET: api/Products/5
         //get single product
         [HttpGet("{id}", Name = "GetSingleProduct")]
-        public async Task<IActionResult> Get([FromRoute] int id)
+        public IActionResult Get(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -83,7 +83,8 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"
                         SELECT Id, ProductTypeId, CustomerId, Price, Title, Description, Quantity
-                        FROM Product";
+                        FROM Product
+                        WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -91,7 +92,7 @@ namespace BangazonAPI.Controllers
 
                     if (reader.Read())
                     {
-                        Product p = new Product
+                        product = new Product
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
                             ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
@@ -119,10 +120,9 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Product (Id, ProductTypeId, CustomerId, Price, Title, Description, Quantity)
+                    cmd.CommandText = @"INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, Description, Quantity)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@id, @productTypeId, @customerId, @price, @title, @description, @quantity)";
-                    cmd.Parameters.Add(new SqlParameter("@id", product.Id));
+                                        VALUES (@productTypeId, @customerId, @price, @title, @description, @quantity)";
                     cmd.Parameters.Add(new SqlParameter("@productTypeId", product.ProductTypeId));
                     cmd.Parameters.Add(new SqlParameter("@customerId", product.CustomerId));
                     cmd.Parameters.Add(new SqlParameter("@price", product.Price));
@@ -149,8 +149,7 @@ namespace BangazonAPI.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"UPDATE Product
-                                            SET Id = @id,
-                                                ProductTypeId = @productTypeId,
+                                            SET ProductTypeId = @productTypeId,
                                                 CustomerId = @customerId,
                                                 Price = @price,
                                                 Title = @title,
