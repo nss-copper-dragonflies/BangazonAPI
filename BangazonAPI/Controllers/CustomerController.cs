@@ -31,25 +31,69 @@ namespace BangazonAPI.Controllers
 
         // GET: api/Customer
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get(string include, string q)
         {
             using(SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Id, FirstName, LastName FROM Customer";
+                    if (include == "products" || include == "product")
+                    {
+                        cmd.CommandText = @"SELECT c.Id AS CustomerId,
+			                                c.FirstName, 
+			                                c.LastName,
+			                                p.title,
+			                                p.[description],
+			                                p.price,
+			                                p.quantity
+		                                FROM Customer c
+			                                LEFT JOIN Product p on c.Id = p.CustomerId
+                                        WHERE 1 = 1";
+                    }
+                    else if (include == "payment" || include == "payments")
+                    {
+                        cmd.CommandText = @"SELECT c.Id AS CustomerId,
+			                                c.FirstName, 
+			                                c.LastName
+			                                a.[name],
+			                                a.acctNumber
+		                                FROM Customer c
+			                                LEFT JOIN PaymentType a on c.Id = a.CustomerId
+                                        WHERE 1 = 1";
+                    }
+                    else
+                    {
+                        cmd.CommandText = @"SELECT Id, FirstName, LastName 
+                                                FROM Customer
+                                                WHERE 1 = 1";
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(q))
+                    {
+                        cmd.CommandText += @" AND
+                                                (c.FirstName LIKE @q OR
+                                                 c.LastName LIKE @q)";
+                        cmd.Parameters.Add(new SqlParameter("q", $"%{q}%"));
+                    }
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    List<Customer> customers = new List<Customer>();
+                    Dictionary<int, Customer> customers = new Dictionary<int, Customer>();
                     while (reader.Read())
                     {
-                        customers.Add(new Customer
+                        int customerId = reader.GetInt32(reader.GetOrdinal("Id"));
+                        if (!customers.ContainsKey(customerId))
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                        });
+                            Customer customer = new Customer
+                            {
+                                Id = customerId,
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                            };
+                            customers.Add(customerId, customer);
+                        }
+                        
                     }
 
                     reader.Close();
@@ -60,7 +104,7 @@ namespace BangazonAPI.Controllers
 
         // GET: api/Customer/5
         [HttpGet("{id}", Name = "GetCustomer")]
-        public IActionResult GetCustomer(int id)
+        public IActionResult Get(int id)
         {
             using (SqlConnection conn = Connection)
             {
