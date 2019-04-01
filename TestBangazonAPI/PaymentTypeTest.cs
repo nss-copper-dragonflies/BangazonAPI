@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using TestBangazonAPI.Test;
 using Xunit;
 
 //JORDAN ROSAS : Integration Tests for the payment types of the bangazon project. Testing Get, Put, Post, and Delete functionality
@@ -15,7 +16,7 @@ using Xunit;
      ===========*/
      //PT = PaymentType
      //DB = Databse
-namespace PaymentTypeTest.Tests
+namespace TestBangazonAPI
 {
     public class PaymentTypeTest
     {
@@ -101,13 +102,13 @@ namespace PaymentTypeTest.Tests
             }
         }
         //PUT
+        //============================= MY FAVORITE TEST ===============================//
         [Fact]
         public async Task Update_Existing_Payment_Type()
         {
             using (var client = new APIClientProvider().Client)
             {
-                //==========GET a list of all the payment types 
-
+                //==================================GET a list of all the payment types ===================================//
                 //going to api/payment types
                 var paymentTypeResponse = await client.GetAsync("api/PaymentType");
                 
@@ -119,30 +120,28 @@ namespace PaymentTypeTest.Tests
                 //Asserting that the list will have more items than 0 in it.
 
                 //selecting the first PaymentType object in the list using [0]
-                var PaymentTypeObj = paymentTypeList[0];
+                var paymentTypeObj = paymentTypeList[0];
 
                 //assigned default value of the account number for later
-                var defaultAcctNumber = PaymentTypeObj.AcctNumber;
+                var defaultAcctNumber = paymentTypeObj.AcctNumber;
 
                 //modify the Acctnumber of the selected object
-                PaymentTypeObj.AcctNumber = 1111;
+                paymentTypeObj.AcctNumber = 1111;
 
                 //Serialize the C# object into JSON object 
-                var paymentTypeJson = JsonConvert.SerializeObject(PaymentTypeObj);
+                var paymentTypeJson = JsonConvert.SerializeObject(paymentTypeObj);
 
                 //need to use the client to send the request and store the response
                 var response = await client.PutAsync(
-                    "/api/PaymentType/1",
+                    $"/api/PaymentType/{paymentTypeObj.id}",
                     new StringContent(paymentTypeJson, Encoding.UTF8, "application/json")
                 );
                 string newModifiedObjBody = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
                 
-                //Get by id to verify the value was changed
-
                 //going to api/PaymentTypes/1 - targeting a specific PaymentType Obj in the DB
-                var specific_PT = await client.GetAsync("api/PaymentType/1");
+                var specific_PT = await client.GetAsync($"api/PaymentType/{paymentTypeObj.id}");
                 //wait until specific_PT is complete then read that response as a string
                 string modPaymentTypeRespinseBody = await specific_PT.Content.ReadAsStringAsync();
                 //Then we convert the json into something that C# can read and create a list of all of the payment types
@@ -153,21 +152,16 @@ namespace PaymentTypeTest.Tests
 
                 //set obj back to original value by doing another put
                 specific_PT_res.AcctNumber = defaultAcctNumber;
-                var originalPaymentTypeJson = JsonConvert.SerializeObject(PaymentTypeObj);
+                var originalPaymentTypeJson = JsonConvert.SerializeObject(paymentTypeObj);
 
                 //need to use the client to send the request and store the response
                 var originalResponse = await client.PutAsync(
-                    "/api/PaymentType/1",
+                    $"/api/PaymentType/{paymentTypeObj.id}",
                     new StringContent(paymentTypeJson, Encoding.UTF8, "application/json")
                 );
                 string originalPaymentTypeObject = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
-
-
-
-
             }
         }
         [Fact]

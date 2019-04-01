@@ -3,8 +3,7 @@ using BangazonAPI;
 using System.Net.Http;
 using Xunit;
 
-
-namespace PaymentTypeTest.Tests
+namespace TestBangazonAPI.Test
 {
     class APIClientProvider : IClassFixture<WebApplicationFactory<Startup>>
     {

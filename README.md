@@ -15,7 +15,7 @@ and most powerful commericial platform for individuals all around the globe.
 - Was assigned the Payment Type issue ticket
 - Wrote the integration tests, Controller, and Model for the Ticket
 - All tests are passing 
-- Methods in the controller are preforming 
+- Methods in the controller are performing 
 - Developer can now GET single, GET all, POST, PUT, and DELETE all Payment Types.
 
 ## Technologies Used To Build This Application
