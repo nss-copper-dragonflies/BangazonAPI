@@ -27,7 +27,7 @@ namespace BangazonAPI.Controllers
         public SqlConnection Connection
         {
             get
-            {
+            { 
                 string connectionString = _config.GetConnectionString("DefaultConnection");
                 return new SqlConnection(connectionString);
             }
