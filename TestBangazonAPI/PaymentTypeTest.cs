@@ -99,39 +99,41 @@ namespace PaymentTypeTest.Tests
                 Assert.Equal("MasterCard", newMasterCardInDB.Name);
             }
         }
+        //PUT
         [Fact]
-        public async Task Modify_existing_payment_method()
+        public async Task Update_Existing_Payment_Type()
         {
-            int newAcctNumber = 1234;
+            int newCustomerId = 5;
 
             using (var client = new APIClientProvider().Client)
             {
                 PaymentType modifiedPaymentType = new PaymentType
                 {
-                    Name = "MasterCard",
-                    AcctNumber = newAcctNumber,
-                    CustomerId = 3
+                    Name = "venmo",
+                    AcctNumber = 1234,
+                    CustomerId = newCustomerId
                 };
-                var modified_PT_as_JSON = JsonConvert.SerializeObject(modifiedPaymentType);
+                var modifiedPaymentTypeAsJSON = JsonConvert.SerializeObject(modifiedPaymentType);
 
                 var response = await client.PutAsync(
-                    "api/PaymentType/3",
-                    new StringContent(modified_PT_as_JSON, Encoding.UTF8, "application/json")
+                    "/api/PaymentType/1",
+                    new StringContent(modifiedPaymentTypeAsJSON, Encoding.UTF8, "application/json")
                 );
                 string responseBody = await response.Content.ReadAsStringAsync();
+
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
                 /*========================================================
                  * Get to verify the put was successful
                  ========================================================*/
-                var mod_PT = await client.GetAsync("api/PaymentType/3");
-                mod_PT.EnsureSuccessStatusCode();
+                var getPaymentType = await client.GetAsync("/api/PaymentType/1");
+                getPaymentType.EnsureSuccessStatusCode();
 
-                string getMod_PT_body = await mod_PT.Content.ReadAsStringAsync();
-                PaymentType new_PT = JsonConvert.DeserializeObject<PaymentType>(getMod_PT_body);
+                string getPaymentTypeBody = await getPaymentType.Content.ReadAsStringAsync();
+                var newPaymentType = JsonConvert.DeserializeObject<PaymentType>(getPaymentTypeBody);
 
-                Assert.Equal(HttpStatusCode.OK, mod_PT.StatusCode);
-                Assert.Equal(newAcctNumber, new_PT.AcctNumber);
+                Assert.Equal(HttpStatusCode.OK, getPaymentType.StatusCode);
+                Assert.Equal(newCustomerId, newPaymentType.CustomerId);
             }
         }
     }
