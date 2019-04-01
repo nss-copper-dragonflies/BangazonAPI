@@ -92,20 +92,49 @@ namespace BangazonAPI.Controllers
 
         // POST: api/Customer
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] Customer newCustomer)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Customer (FirstName, LastName)
+                                            OUTPUT INSERTED.Id
+                                            VALUES (@FirstName, @LastName)";
+                    cmd.Parameters.Add(new SqlParameter("@FirstName", newCustomer.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@LastName", newCustomer.LastName));
+
+                    int newId = (int) cmd.ExecuteScalar();
+
+                    newCustomer.Id = newId;
+                    return CreatedAtRoute("GetCustomer", new { id = newId }, newCustomer);
+                }
+            }
         }
 
         // PUT: api/Customer/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult Put(int id, [FromBody] Customer updatedCustomer)
         {
-        }
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Customer
+                                            SET FirstName = @FirstName,
+                                                LastName = @LastName
+                                            WHERE id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@FirstName", updatedCustomer.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@LastName", updatedCustomer.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
 
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+                    cmd.ExecuteNonQuery();
+
+                    return NoContent();
+                }
+            }
         }
     }
 }
