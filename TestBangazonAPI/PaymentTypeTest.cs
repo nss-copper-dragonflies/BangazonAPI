@@ -141,23 +141,17 @@ namespace PaymentTypeTest.Tests
         {
             using (var client = new APIClientProvider().Client)
             {
-                // Use the client to send the request and store the response
-                var response = await client.DeleteAsync("/api/PaymentType/6");
 
-                // Store the JSON body of the response
+                var response = await client.DeleteAsync("/api/PaymentType/9");
+
+
                 string responseBody = await response.Content.ReadAsStringAsync();
+                var PaymentType = JsonConvert.DeserializeObject<PaymentType>(responseBody);
 
-                /* ASSERT */
-
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
-                var getPaymentType = await client.GetAsync("/api/PaymentType/6");
-                getPaymentType.EnsureSuccessStatusCode();
-
-                string getPaymentTypeBody = await getPaymentType.Content.ReadAsStringAsync();
-                PaymentType newPaymentType = JsonConvert.DeserializeObject<PaymentType>(getPaymentTypeBody);
-
-                Assert.Equal(HttpStatusCode.NoContent, getPaymentType.StatusCode);
+                /*
+                    ASSERT
+                */
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             }
         }
     }
