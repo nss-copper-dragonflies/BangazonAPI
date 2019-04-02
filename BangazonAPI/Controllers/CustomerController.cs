@@ -31,14 +31,14 @@ namespace BangazonAPI.Controllers
 
         // GET: api/Customer
         [HttpGet]
-        public IActionResult Get(string include, string q)
+        public IEnumerable<Customer> GetAllCustomers(string include, string q)
         {
-            using(SqlConnection conn = Connection)
+            using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    if (include == "products" || include == "product")
+                    if (include == "product")
                     {
                         cmd.CommandText = @"SELECT c.Id AS CustomerId,
 			                                c.FirstName, 
@@ -51,11 +51,12 @@ namespace BangazonAPI.Controllers
 			                                LEFT JOIN Product p on c.Id = p.CustomerId
                                         WHERE 1 = 1";
                     }
-                    else if (include == "payment" || include == "payments")
+                    else if (include == "payment")
                     {
                         cmd.CommandText = @"SELECT c.Id AS CustomerId,
 			                                c.FirstName, 
-			                                c.LastName
+			                                c.LastName,
+                                            a.Id AS PaymentTypeId,
 			                                a.[name],
 			                                a.acctNumber
 		                                FROM Customer c
@@ -64,7 +65,7 @@ namespace BangazonAPI.Controllers
                     }
                     else
                     {
-                        cmd.CommandText = @"SELECT Id, FirstName, LastName 
+                        cmd.CommandText = @"SELECT Id AS CustomerId, FirstName, LastName 
                                                 FROM Customer
                                                 WHERE 1 = 1";
                     }
@@ -74,7 +75,7 @@ namespace BangazonAPI.Controllers
                         cmd.CommandText += @" AND
                                                 (c.FirstName LIKE @q OR
                                                  c.LastName LIKE @q)";
-                        cmd.Parameters.Add(new SqlParameter("q", $"%{q}%"));
+                        cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
                     }
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -82,7 +83,7 @@ namespace BangazonAPI.Controllers
                     Dictionary<int, Customer> customers = new Dictionary<int, Customer>();
                     while (reader.Read())
                     {
-                        int customerId = reader.GetInt32(reader.GetOrdinal("Id"));
+                        int customerId = reader.GetInt32(reader.GetOrdinal("CustomerId"));
                         if (!customers.ContainsKey(customerId))
                         {
                             Customer customer = new Customer
@@ -93,11 +94,48 @@ namespace BangazonAPI.Controllers
                             };
                             customers.Add(customerId, customer);
                         }
-                        
+
+                        //if (include == "products" || include == "product")
+                        //{
+                        //    if (!reader.IsDBNull(reader.GetOrdinal("productId")))
+                        //    {
+                        //        Customer currentCustomer = customers[customerId];
+                        //        currentCustomer.Products.Add(
+                        //            new Product
+                        //            {
+                        //                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                        //                ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                        //                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                        //                Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                        //                Title = reader.GetString(reader.GetOrdinal("Title")),
+                        //                Description = reader.GetString(reader.GetOrdinal("Description")),
+                        //                Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                        //            }
+                        //            );
+                        //    }
+                        //}
+
+                        if (include == "payment")
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
+                            {
+                                Customer currentCustomer = customers[customerId];
+                                currentCustomer.PaymentTypes.Add(
+                                    new PaymentType
+                                    {
+                                        id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                        Name = reader.GetString(reader.GetOrdinal("name")),
+                                        AcctNumber = reader.GetInt32(reader.GetOrdinal("acctNumber")),
+                                        CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                                    }
+                                );
+                            }
+                        }
                     }
 
                     reader.Close();
-                    return Ok(customers);
+
+                    return customers.Values.ToList();
                 }
             }
         }
