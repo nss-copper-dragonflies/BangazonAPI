@@ -1,4 +1,4 @@
-﻿//author: Allison Collins
+﻿//author: Allison Collins. This method has the HTTP methods to GET all, GET single, POST, PUT, and DELETE data.
 
 using System;
 using System.Collections.Generic;

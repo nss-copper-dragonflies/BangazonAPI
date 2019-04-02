@@ -1,4 +1,4 @@
-﻿//author: Allison Collins
+﻿//author: Allison Collins. Integration tests for GET all, GET single, POST, PUT, and DELETE products.
 
 
 using Newtonsoft.Json;

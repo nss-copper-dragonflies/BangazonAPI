@@ -18,6 +18,14 @@ and most powerful commericial platform for individuals all around the globe.
 - Methods in the controller are performing 
 - Developer can now GET single, GET all, POST, PUT, and DELETE all Payment Types.
 
+## Product Resource 
+- Author: Allison Collins
+- Was assigned the Product issue ticket
+- Wrote the integration tests, Controller, and Model for the Ticket
+- All tests are passing 
+- Methods in the controller are performing 
+- Developer can now GET single, GET all, POST, PUT, and DELETE all Products.
+
 ## Technologies Used To Build This Application
 - C#
 - Xunit as testing framework
