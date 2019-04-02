@@ -158,5 +158,23 @@ namespace TestBangazonAPI
         }
 
         //DELETE test
+        [Fact]
+        public async Task Test_Delete_Product()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+
+                var response = await client.DeleteAsync("/api/Product/6");
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var Product = JsonConvert.DeserializeObject<Product>(responseBody);
+
+                /*
+                    ASSERT
+                */
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+        }
     }
 }

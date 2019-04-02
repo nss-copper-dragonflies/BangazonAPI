@@ -188,40 +188,21 @@ namespace BangazonAPI.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public void Delete(int id)
         {
-            try
+            using (SqlConnection conn = Connection)
             {
-                using (SqlConnection conn = Connection)
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"DELETE FROM Product WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                    cmd.CommandText = @"DELETE Product WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
-                        }
-                        throw new Exception("No rows affected");
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
+                    cmd.ExecuteNonQuery();
                 }
             }
         }
-
+                
         private bool ProductExists(int id)
         {
             using (SqlConnection conn = Connection)
