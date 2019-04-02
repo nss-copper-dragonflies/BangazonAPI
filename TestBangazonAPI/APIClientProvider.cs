@@ -1,17 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
-<<<<<<< HEAD
 using System.Net.Http;
 using Xunit;
 using BangazonAPI;
-
-namespace TestBangazonAPI
-=======
-using BangazonAPI;
-using System.Net.Http;
-using Xunit;
 
 namespace TestBangazonAPI.Test
->>>>>>> master
+
 {
     class APIClientProvider : IClassFixture<WebApplicationFactory<Startup>>
     {
@@ -29,8 +22,5 @@ namespace TestBangazonAPI.Test
             Client?.Dispose();
         }
     }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> master
+
