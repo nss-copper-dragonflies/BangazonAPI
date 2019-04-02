@@ -14,6 +14,15 @@ and most powerful commericial platform for individuals all around the globe.
 - Author: Brittany Ramos-Janeway
 - Responsible for the integration tests, controller, and creating the Customer class
 
+## Payment Type Resource 
+- Author: Jordan Rosas
+- Was assigned the Payment Type issue ticket
+- Wrote the integration tests, Controller, and Model for the Ticket
+- All tests are passing 
+- Methods in the controller are performing 
+- Developer can now GET single, GET all, POST, PUT, and DELETE all Payment Types.
+
+
 ## Technologies Used To Build This Application
 - C#
 - Xunit as testing framework
