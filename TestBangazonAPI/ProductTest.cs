@@ -125,6 +125,7 @@ namespace TestBangazonAPI
                 */
                 Product modifiedJeans = new Product
                 {
+                    Id = 5,
                     ProductTypeId = 3,
                     CustomerId = 5,
                     Price = 150,

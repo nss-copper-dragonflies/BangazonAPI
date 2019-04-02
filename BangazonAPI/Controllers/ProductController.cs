@@ -156,7 +156,7 @@ namespace BangazonAPI.Controllers
                                                 Description = @description,
                                                 Quantity = @quantity
                                             WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@id", product.Id));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
                         cmd.Parameters.Add(new SqlParameter("@productTypeId", product.ProductTypeId));
                         cmd.Parameters.Add(new SqlParameter("@customerId", product.CustomerId));
                         cmd.Parameters.Add(new SqlParameter("@price", product.Price));
@@ -193,6 +193,14 @@ namespace BangazonAPI.Controllers
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE OrderProduct WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    cmd.ExecuteNonQuery();
+                }
+
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"DELETE Product WHERE Id = @id";
