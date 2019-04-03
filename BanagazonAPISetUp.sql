@@ -100,11 +100,3 @@ SELECT * FROM Customer;
 SELECT * FROM Product;
 SELECT * FROM PaymentType;
 SELECT * FROM [Order];
-<<<<<<< HEAD
-SELECT * FROM ProductType;
-
-SELECT e.Id, e.FirstName, e.LastName, e.IsSupervisor, e.DepartmentId, d.[Name]
-	FROM Employee e INNER JOIN Department d ON  e.DepartmentId = d.Id;
-=======
-SELECT * FROM ProductType;
->>>>>>> 4e06d86644a51662797ef7c8e16dedce28f3adb4
