@@ -6,12 +6,18 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using TestBangazonAPI.Test;
 using Xunit;
+
+//Author: Brittany Ramos-Janeway
+//Function: Performs the tests for the Get list, Get individual, Post, and Put methods in the customer resource controller
 
 namespace TestBangazonAPI
 {
     public class CustomerTest
     {
+
+        //Get all customers test
         [Fact]
         public async Task Test_Get_All_Customers()
         {
@@ -28,6 +34,7 @@ namespace TestBangazonAPI
             }
         }
 
+        //Get single customer test
         [Fact]
         public async Task Test_Get_Specific_Customer()
         {
@@ -42,6 +49,7 @@ namespace TestBangazonAPI
             }
         }
 
+        //Put method test
         [Fact]
         public async Task Test_Modify_Customer()
         {
@@ -76,6 +84,7 @@ namespace TestBangazonAPI
             }
         }
 
+        //Post method test
         [Fact]
         public async Task Test_Create_Customer()
         {

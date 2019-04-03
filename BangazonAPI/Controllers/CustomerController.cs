@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
+//Author: Brittany Ramos-Janeway
+//Function: Performs the Get list, Get Single, Post, and Put for the Customer's Resource. Allows for querying,including payment type details, and including customer product details.
+
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -29,7 +32,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // GET: api/Customer
+        // Gets all customers. Customers can include payment type and product type. Customers can be queried.
         [HttpGet]
         public IEnumerable<Customer> GetAllCustomers(string include, string q)
         {
@@ -43,7 +46,9 @@ namespace BangazonAPI.Controllers
                         cmd.CommandText = @"SELECT c.Id AS CustomerId,
 			                                c.FirstName, 
 			                                c.LastName,
+                                            p.Id AS ProductId,
 			                                p.title,
+                                            p.productTypeId,
 			                                p.[description],
 			                                p.price,
 			                                p.quantity
@@ -65,8 +70,8 @@ namespace BangazonAPI.Controllers
                     }
                     else
                     {
-                        cmd.CommandText = @"SELECT Id AS CustomerId, FirstName, LastName 
-                                                FROM Customer
+                        cmd.CommandText = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName 
+                                                FROM Customer c
                                                 WHERE 1 = 1";
                     }
 
@@ -95,25 +100,25 @@ namespace BangazonAPI.Controllers
                             customers.Add(customerId, customer);
                         }
 
-                        //if (include == "products" || include == "product")
-                        //{
-                        //    if (!reader.IsDBNull(reader.GetOrdinal("productId")))
-                        //    {
-                        //        Customer currentCustomer = customers[customerId];
-                        //        currentCustomer.Products.Add(
-                        //            new Product
-                        //            {
-                        //                Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
-                        //                ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
-                        //                CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                        //                Price = reader.GetInt32(reader.GetOrdinal("Price")),
-                        //                Title = reader.GetString(reader.GetOrdinal("Title")),
-                        //                Description = reader.GetString(reader.GetOrdinal("Description")),
-                        //                Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
-                        //            }
-                        //            );
-                        //    }
-                        //}
+                        if (include == "product")
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("ProductId")))
+                            {
+                                Customer currentCustomer = customers[customerId];
+                                currentCustomer.Products.Add(
+                                    new Product
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                        ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                        CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                        Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                        Title = reader.GetString(reader.GetOrdinal("Title")),
+                                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                                        Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                                    }
+                                    );
+                            }
+                        }
 
                         if (include == "payment")
                         {
@@ -140,30 +145,98 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // GET: api/Customer/5
+        // Get a single customer based on customer id. The customer information can include customer products and customer payment types.
         [HttpGet("{id}", Name = "GetCustomer")]
-        public IActionResult Get(int id)
+        public IActionResult Get(int id, string include)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT FirstName, LastName 
-                                            FROM Customer
-                                            WHERE Id = @Id";
+                    if (include == "product")
+                    {
+                        cmd.CommandText = @"SELECT c.Id AS CustomerId,
+			                                c.FirstName, 
+			                                c.LastName,
+                                            p.Id AS ProductId,
+			                                p.title,
+                                            p.productTypeId,
+			                                p.[description],
+			                                p.price,
+			                                p.quantity
+		                                FROM Customer c
+			                                LEFT JOIN Product p on c.Id = p.CustomerId ";
+                    }
+                    else if (include == "payment")
+                    {
+                        cmd.CommandText = @"SELECT c.Id AS CustomerId,
+			                                c.FirstName, 
+			                                c.LastName,
+                                            a.Id AS PaymentTypeId,
+			                                a.[name],
+			                                a.acctNumber
+		                                FROM Customer c
+			                                LEFT JOIN PaymentType a on c.Id = a.CustomerId";
+                    }
+                    else
+                    {
+                        cmd.CommandText = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName 
+                                                FROM Customer c";
+                    }
+
+                    cmd.CommandText += " WHERE CustomerId = @Id";
                     cmd.Parameters.Add(new SqlParameter("@Id", id));
+
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     Customer customer = null;
-                    if (reader.Read())
+                    while (reader.Read())
                     {
-                        customer = new Customer
+                        if(customer == null)
                         {
-                            Id = id,
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName"))
-                        };
+                            customer = new Customer
+                            {
+                                Id = id,
+                                FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                LastName = reader.GetString(reader.GetOrdinal("LastName"))
+                            };
+                        }
+
+                        if (include == "product")
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("ProductId")))
+                            {
+                                customer.Products.Add(
+                                    new Product
+                                    {
+                                        Id = reader.GetInt32(reader.GetOrdinal("ProductId")),
+                                        ProductTypeId = reader.GetInt32(reader.GetOrdinal("ProductTypeId")),
+                                        CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                        Price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                        Title = reader.GetString(reader.GetOrdinal("Title")),
+                                        Description = reader.GetString(reader.GetOrdinal("Description")),
+                                        Quantity = reader.GetInt32(reader.GetOrdinal("Quantity"))
+                                    }
+                                    );
+                            }
+                        }
+
+                        if (include == "payment")
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
+                            {
+                                customer.PaymentTypes.Add(
+                                    new PaymentType
+                                    {
+                                        id = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                                        Name = reader.GetString(reader.GetOrdinal("name")),
+                                        AcctNumber = reader.GetInt32(reader.GetOrdinal("acctNumber")),
+                                        CustomerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
+                                    }
+                                );
+                            }
+                        }
                     }
 
                     reader.Close();
@@ -172,7 +245,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // POST: api/Customer
+        // Post a new customer
         [HttpPost]
         public IActionResult Post([FromBody] Customer newCustomer)
         {
@@ -195,7 +268,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // PUT: api/Customer/5
+        // Put an existing customer based on customer Id
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Customer updatedCustomer)
         {
