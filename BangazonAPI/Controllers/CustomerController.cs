@@ -41,6 +41,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+                    //this if statement catches the search parameters for the words "product" and "payment"
                     if (include == "product")
                     {
                         cmd.CommandText = @"SELECT c.Id AS CustomerId,
@@ -75,6 +76,7 @@ namespace BangazonAPI.Controllers
                                                 WHERE 1 = 1";
                     }
 
+                    //this if statement allows for querying of any customer properties
                     if (!string.IsNullOrWhiteSpace(q))
                     {
                         cmd.CommandText += @" AND
@@ -100,6 +102,7 @@ namespace BangazonAPI.Controllers
                             customers.Add(customerId, customer);
                         }
 
+                        //this "if" statement includes the details of a product with its corresponding customer in the case that product is included as a search parameter
                         if (include == "product")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("ProductId")))
@@ -120,6 +123,7 @@ namespace BangazonAPI.Controllers
                             }
                         }
 
+                        //this "if" statement includes the details of a payment type with its corresponding customer in the case that payment is included as a search parameter
                         if (include == "payment")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
@@ -154,9 +158,10 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+                    //this if statement catches the search parameters for the words "product" and "payment"
                     if (include == "product")
                     {
-                        cmd.CommandText = @"SELECT c.Id AS CustomerId,
+                        cmd.CommandText = @"SELECT c.Id,
 			                                c.FirstName, 
 			                                c.LastName,
                                             p.Id AS ProductId,
@@ -170,7 +175,7 @@ namespace BangazonAPI.Controllers
                     }
                     else if (include == "payment")
                     {
-                        cmd.CommandText = @"SELECT c.Id AS CustomerId,
+                        cmd.CommandText = @"SELECT c.Id,
 			                                c.FirstName, 
 			                                c.LastName,
                                             a.Id AS PaymentTypeId,
@@ -181,11 +186,11 @@ namespace BangazonAPI.Controllers
                     }
                     else
                     {
-                        cmd.CommandText = @"SELECT c.Id AS CustomerId, c.FirstName, c.LastName 
+                        cmd.CommandText = @"SELECT c.Id, c.FirstName, c.LastName 
                                                 FROM Customer c";
                     }
 
-                    cmd.CommandText += " WHERE CustomerId = @Id";
+                    cmd.CommandText += " WHERE Id = @Id";
                     cmd.Parameters.Add(new SqlParameter("@Id", id));
 
                     SqlDataReader reader = cmd.ExecuteReader();
@@ -203,6 +208,7 @@ namespace BangazonAPI.Controllers
                             };
                         }
 
+                        //this "if" statement includes the details of a product with its corresponding customer in the case that product is included as a search parameter
                         if (include == "product")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("ProductId")))
@@ -222,6 +228,7 @@ namespace BangazonAPI.Controllers
                             }
                         }
 
+                        //this "if" statement includes the details of a payment type with its corresponding customer in the case that payment is included as a search parameter
                         if (include == "payment")
                         {
                             if (!reader.IsDBNull(reader.GetOrdinal("PaymentTypeId")))
@@ -245,7 +252,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // Post a new customer
+        // Posts a new customer to the database
         [HttpPost]
         public IActionResult Post([FromBody] Customer newCustomer)
         {

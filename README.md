@@ -13,6 +13,9 @@ and most powerful commericial platform for individuals all around the globe.
 ## Customer Resource
 - Author: Brittany Ramos-Janeway
 - Responsible for the integration tests, controller, and creating the Customer class
+- All tests are passing
+- Methods in the controller are performing
+- Developer is able to GET individual customers, GET all customers, POST new customers, and PUT existing customers
 
 ## Payment Type Resource 
 - Author: Jordan Rosas
