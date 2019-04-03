@@ -48,6 +48,7 @@ namespace BangazonAPI.Controllers
 
                     List<Employee> employees = new List<Employee>();
 
+                    //Reads through the employee data and adds each one to the list of employees
                     while (reader.Read())
                     {
                         Employee employee = new Employee
@@ -56,18 +57,59 @@ namespace BangazonAPI.Controllers
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                            
-                        }
+                            //Department = new Department
+                            //{
+                                //waiting for info
+                            //}
+                        };
+                        employees.Add(employee);
                     }
+                    reader.Close();
+
+                    return Ok(employees);
                 }
             }
         }
 
         // GET: api/Employee/5
         [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        public async Task<IActionResult> Get([FromRoute] int id)
         {
-            return "value";
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using(SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"SELECT e.Id, e.FirstName, 
+                                            e.LastName, e.IsSupervisor, 
+                                            e.DepartmentId, d.[Name]
+                                        FROM Employee e INNER JOIN Department d 
+                                            ON  e.DepartmentId = d.Id
+                                        WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Employee employee = null;
+
+                    if (reader.Read())
+                    {
+                        employee = new Employee
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                            IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
+                            //Department = new Department
+                            //{
+                            //waiting for info
+                            //}
+                        };
+                    }
+                    reader.Close();
+
+                    return Ok(employee);
+                }
+            }
         }
 
         // POST: api/Employee
