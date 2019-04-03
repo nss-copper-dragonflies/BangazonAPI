@@ -101,3 +101,6 @@ SELECT * FROM Product;
 SELECT * FROM PaymentType;
 SELECT * FROM [Order];
 SELECT * FROM ProductType;
+
+SELECT e.Id, e.FirstName, e.LastName, e.IsSupervisor, e.DepartmentId, d.[Name]
+	FROM Employee e INNER JOIN Department d ON  e.DepartmentId = d.Id;
