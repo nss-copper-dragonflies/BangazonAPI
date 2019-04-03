@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
+using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -30,32 +31,88 @@ namespace BangazonAPI.Controllers
 
         // GET: api/Department
         [HttpGet]
-        public async Task <IActionResult> Get(string include, string q)
+        public IEnumerable<Department> Get(string include, string q)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
-                using(SqlCommand cmd = conn.CreateCommand())
+                using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    if(include == "employees")
+                    if (include == "employees")
                     {
-                        cmd.CommandText = @"select department.[Name], 
-                                                    employee.Id, 
+                        cmd.CommandText = @"select  department.id as Departmentid, 
+                                                    department.[Name] as departmentName, 
+                                                    department.budget, 
+                                                    employee.Id as employeeId, 
                                                     employee.FirstName, 
-                                                    employee.LastName, 
+                                                    employee.LastName,
+                                                    employee.isSupervisor,
                                                     employee.DepartmentId 
                                             from Department 
-                                            left join employee on Department.Id = employee.DepartmentId";
+                                            left join employee on Department.Id = employee.DepartmentId
+                                            Where 1=1";
                     }
+                    else
+                    {
+                        cmd.CommandText = @"select department.id as Departmentid, department.[name] as departmentName, department.budget
+                                            From department
+                                            Where 1=1";
+                    }
+                    if (!string.IsNullOrWhiteSpace(q))
+                    {
+                        cmd.CommandText += @" AND
+                                                (department.[name] LIKE @q)";
+                        cmd.Parameters.Add(new SqlParameter("@q", $"%{q}%"));
+                    }
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Dictionary<int, Department> departmentDictionary = new Dictionary<int, Department>();
+
+                    while (reader.Read())
+                    {
+                        int Departmentid = reader.GetInt32(reader.GetOrdinal("Departmentid"));
+                        if (!departmentDictionary.ContainsKey(Departmentid))
+                        {
+                            Department newDepartment = new Department
+                            {
+                                id = Departmentid,
+                                Name = reader.GetString(reader.GetOrdinal("departmentName")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            };
+                            departmentDictionary.Add(Departmentid, newDepartment);
+                        }
+
+                        if (include == "employees")
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("employeeId")))
+                            {
+                                Department currentDepartment = departmentDictionary[Departmentid];
+                                currentDepartment.employeeList.Add(
+                                   new Employee
+                                   {
+                                       id = reader.GetInt32(reader.GetOrdinal("employeeId")),
+                                       FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                       LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                       isSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor")),
+                                       DepartmentId = reader.GetInt32(reader.GetOrdinal("departmentId"))
+
+                                   }
+                                );
+                            }
+                        }
+                    }
+                    reader.Close();
+                    return departmentDictionary.Values.ToList();
                 }
             }
         }
 
         // GET: api/Department/5
-        [HttpGet("{id}", Name = "Get")]
-        public async Task<IActionResult> Get(int id)
+        [HttpGet("{id}", Name = "GetSpecific")]
+        public void  Get(int id)
         {
-            return "value";
+
         }
 
         // POST: api/Department
