@@ -107,30 +107,125 @@ namespace BangazonAPI.Controllers
                 }
             }
         }
+        //GET by Id with query strings!
 
-        // GET: api/Department/5
         [HttpGet("{id}", Name = "GetSpecific")]
-        public void  Get(int id)
+        public IActionResult Get(int id, string include)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    //this if statement catches the search parameters for the words "product" and "payment"
+                    if (include == "employees")
+                    {
+                        cmd.CommandText = @"select  department.id as Departmentid, 
+                                                    department.[Name] as departmentName, 
+                                                    department.budget, 
+                                                    employee.Id as employeeId, 
+                                                    employee.FirstName, 
+                                                    employee.LastName,
+                                                    employee.isSupervisor,
+                                                    employee.DepartmentId 
+                                            from Department 
+                                            left join employee on Department.Id = employee.DepartmentId
+                                            Where department.id = @id";
+                    }
+                    else
+                    {
+                        cmd.CommandText = @"select department.id as Departmentid, department.[name] as departmentName, department.budget
+                                            From department";
+                                            
+                    }
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
 
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    Department department = null;
+                    while (reader.Read())
+                    {
+                        if (department == null)
+                        {
+                            department = new Department
+                            {
+                                id = reader.GetInt32(reader.GetOrdinal("departmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("departmentName")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("budget"))
+                            };
+                        }
+
+                        //this "if" statement includes the details of a product with its corresponding customer in the case that product is included as a search parameter
+                        if (include == "employees")
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("employeeId")))
+                            {
+                                department.employeeList.Add(
+                                    new Employee
+                                    {
+                                        id = reader.GetInt32(reader.GetOrdinal("employeeId")),
+                                        FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
+                                        LastName = reader.GetString(reader.GetOrdinal("LastName")),
+                                        isSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor")),
+                                        DepartmentId = reader.GetInt32(reader.GetOrdinal("departmentId"))
+                                    }
+                                    );
+                            }
+                        }
+                    }
+
+                    reader.Close();
+                    return Ok(department);
+                }
+            }
         }
 
-        // POST: api/Department
+
+        // Posts a new customer to the database
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] Department newDepartment)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Department ([name], budget)
+                                            OUTPUT INSERTED.Id
+                                            VALUES (@name, @budget)";
+                    cmd.Parameters.Add(new SqlParameter("@name", newDepartment.Name));
+                    cmd.Parameters.Add(new SqlParameter("@budget", newDepartment.Budget));
+
+                    int newId = (int)cmd.ExecuteScalar();
+
+                    newDepartment.id = newId;
+                    return CreatedAtRoute( new { id = newId }, newDepartment);
+                }
+            }
         }
 
-        // PUT: api/Department/5
+        // Put an existing customer based on customer Id
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult Put(int id, [FromBody] Department updatedDepartment)
         {
-        }
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"UPDATE Department
+                                            SET [Name] = @name,
+                                                Budget = @budget
+                                            WHERE id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@FirstName", updatedDepartment.Name));
+                    cmd.Parameters.Add(new SqlParameter("@LastName", updatedDepartment.Budget));
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
 
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+                    cmd.ExecuteNonQuery();
+
+                    return NoContent();
+                }
+            }
         }
     }
 }
