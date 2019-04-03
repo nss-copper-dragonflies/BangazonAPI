@@ -102,3 +102,22 @@ SELECT * FROM PaymentType;
 SELECT * FROM [Order];
 SELECT * FROM ProductType;
 
+select department.[Name], employee.Id, employee.FirstName, employee.LastName, employee.DepartmentId 
+from Department left join employee on Department.Id = employee.DepartmentId
+
+delete from employee where id = 9;
+delete from employee where id = 10;
+delete from employee where id = 11;
+delete from employee where id = 12;
+delete from employee where id = 13;
+delete from employee where id = 14;
+delete from employee where id = 15;
+delete from employee where id = 16;
+delete from employee where id = 17;
+delete from employee where id = 18;
+delete from employee where id = 19;
+delete from employee where id = 20;
+delete from employee where id = 21;
+delete from employee where id = 22;
+delete from employee where id = 23;
+delete from employee where id = 24;
