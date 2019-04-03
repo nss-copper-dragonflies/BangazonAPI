@@ -138,6 +138,7 @@ namespace BangazonAPI.Controllers
         }
 
         // PUT: api/Products/5
+        //update product
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Product product)
         {
@@ -187,6 +188,7 @@ namespace BangazonAPI.Controllers
         }
 
         // DELETE: api/ApiWithActions/5
+        // delete product
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
