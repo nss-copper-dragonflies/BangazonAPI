@@ -122,11 +122,9 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE PaymentType
+                        cmd.CommandText = @"UPDATE ProductType
                                             SET 
-                                            AcctNumber =  @acctNumber,
-                                            Name = @name,
-                                            customerId = @customerId
+                                            [Name] = @name
                                         WHERE id = @id";
                         cmd.Parameters.Add(new SqlParameter("@name", productType.Name));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -154,6 +152,40 @@ namespace BangazonAPI.Controllers
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"DELETE ProductType Where id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
+        private bool ProductTypeExists(int id)
+        {
+
+            using (SqlConnection conn = Connection)
+            {
+
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+
+                    cmd.CommandText = $@"SELECT id, [Name]
+                                           FROM ProductType 
+                                          WHERE id = @id";
+
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
+                }
+            }
         }
     }
 }

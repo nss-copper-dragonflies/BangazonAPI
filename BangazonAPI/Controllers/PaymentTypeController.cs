@@ -116,7 +116,6 @@ namespace BangazonAPI.Controllers
 
             }
         }
-        // PUT: api/PaymentType/5
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute]int id, [FromBody] PaymentType paymentType)
         {
@@ -149,14 +148,13 @@ namespace BangazonAPI.Controllers
             }
             catch (Exception)
             {
-                if(!PaymentTypeExists(id))
+                if (!PaymentTypeExists(id))
                 {
                     return NotFound();
                 }
                 throw;
             }
-        }   
-
+        }
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
