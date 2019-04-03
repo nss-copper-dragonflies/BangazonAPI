@@ -10,6 +10,13 @@ and most powerful commericial platform for individuals all around the globe.
 - Write specific controllers building out our API's
 - Learn to be part of a development team
 
+## Customer Resource
+- Author: Brittany Ramos-Janeway
+- Responsible for the integration tests, controller, and creating the Customer class
+- All tests are passing
+- Methods in the controller are performing
+- Developer is able to GET individual customers, GET all customers, POST new customers, and PUT existing customers
+
 ## Payment Type Resource 
 - Author: Jordan Rosas
 - Was assigned the Payment Type issue ticket
@@ -17,6 +24,14 @@ and most powerful commericial platform for individuals all around the globe.
 - All tests are passing 
 - Methods in the controller are performing 
 - Developer can now GET single, GET all, POST, PUT, and DELETE all Payment Types.
+
+## Product Resource 
+- Author: Allison Collins
+- Was assigned the Product issue ticket
+- Wrote the integration tests, Controller, and Model for the Ticket
+- All tests are passing 
+- Methods in the controller are performing 
+- Developer can now GET single, GET all, POST, PUT, and DELETE all Products.
 
 ## Technologies Used To Build This Application
 - C#
