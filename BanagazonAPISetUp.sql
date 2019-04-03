@@ -100,6 +100,7 @@ SELECT * FROM Customer;
 SELECT * FROM Product;
 SELECT * FROM PaymentType;
 SELECT * FROM [Order];
+<<<<<<< HEAD
 SELECT * FROM ProductType;
 
 select department.[Name], employee.Id, employee.FirstName, employee.LastName, employee.DepartmentId 
@@ -121,3 +122,6 @@ delete from employee where id = 21;
 delete from employee where id = 22;
 delete from employee where id = 23;
 delete from employee where id = 24;
+=======
+SELECT * FROM ProductType;
+>>>>>>> master
