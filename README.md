@@ -51,6 +51,13 @@ and most powerful commericial platform for individuals all around the globe.
 - Methods in the controller are performing 
 - Developer can now GET single, GET all, POST, PUT, and DELETE all Products.
 
+## Employee Resource
+- Author: Brittany Ramos-Janeway
+- Wrote the Employee class, integration tests, and controller
+- All tests are passing
+- Methods in the controller are performing
+- Developer can GET single, GET all, POST, and PUT Employees
+
 ## Technologies Used To Build This Application
 - C#
 - Xunit as testing framework
