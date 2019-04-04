@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
@@ -158,22 +159,31 @@ namespace BangazonAPI.Controllers
 
         // DELETE: api/ApiWithActions/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult Delete(int id)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"DELETE PaymentType Where id = @id";
+                    
+                    cmd.CommandText = @"delete from paymenttype where id = @id 
+                                        and not exists(select paymenttypeid from [order] where paymenttypeid = @id)";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
-                    cmd.ExecuteNonQuery();
+                    int rowsAffected = cmd.ExecuteNonQuery();
+                    if(rowsAffected == 0)
+                    {
+                        return new StatusCodeResult(StatusCodes.Status403Forbidden);
+                    }
+                    else
+                    {
+                        return new StatusCodeResult(StatusCodes.Status200OK);
+                    }
                 }
             }
            
         }
-
 
         private bool PaymentTypeExists(int id)
         {

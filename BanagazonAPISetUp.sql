@@ -70,7 +70,7 @@ INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Qua
 INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 5, 150, 'Apple Bottom Jeans', 'Pair with fur boots', 3);
 INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 5, 200, 'Boots with the Fur', 'Pair with apple bottom jeans', 20);
 
-INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (8321, 'American Express', 1);
+INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (8321, 'American Express', 2);
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (4362, 'Visa', 1);
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (1362, 'Mastercard', 2);
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (1038, 'Visa', 3);
@@ -100,3 +100,31 @@ SELECT * FROM Product;
 SELECT * FROM PaymentType;
 SELECT * FROM [Order];
 SELECT * FROM ProductType;
+
+
+select department.[Name], employee.Id, employee.FirstName, employee.LastName, employee.DepartmentId 
+from Department left join employee on Department.Id = employee.DepartmentId
+
+delete from Department where id = 5;
+delete from Department where id = 6;
+delete from Department where id = 7;
+delete from Department where id = 8;
+delete from Department where id = 9;
+delete from Department where id = 10;
+SELECT * FROM ProductType;
+
+select  department.id as Departmentid, 
+                                                    department.[Name] as departmentName, 
+                                                    department.budget, 
+                                                    employee.Id as employeeId, 
+                                                    employee.FirstName, 
+                                                    employee.LastName,
+                                                    employee.isSupervisor,
+                                                    employee.DepartmentId 
+                                            from Department 
+                                            left join employee on Department.Id = employee.DepartmentId
+				
+											where department.Id = 1;
+
+											delete from paymenttype where id = 2 
+                                        and not exists(select paymenttypeid from [order] where paymenttypeid = 2);

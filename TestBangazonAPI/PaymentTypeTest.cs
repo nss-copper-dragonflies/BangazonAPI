@@ -165,12 +165,12 @@ namespace TestBangazonAPI
             }
         }
         [Fact]
-        public async Task Delete_payment_type()
+        public async Task Forbidden_Delete_payment_type()
         {
             using (var client = new APIClientProvider().Client)
             {
 
-                var response = await client.DeleteAsync("/api/PaymentType/9");
+                var response = await client.DeleteAsync("/api/PaymentType/6");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
@@ -179,7 +179,43 @@ namespace TestBangazonAPI
                 /*
                     ASSERT
                 */
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            }
+        }
+        [Fact]
+        public async Task Can_Be_Deleted()
+        {
+            using (var client = new APIClientProvider().Client)
+            {
+                //Creating a new Payment Type in C# later to be serialized to JSON
+                PaymentType CardToDelete = new PaymentType
+                {
+                    Name = "AndyHasChallenges",
+                    AcctNumber = 9518234,
+                    CustomerId = 1
+                };
+
+                //Serialize the C# object into JSON object 
+                var CardToDeleteAsJson = JsonConvert.SerializeObject(CardToDelete);
+
+                //need to use the client to send the request and store the response
+                var response = await client.PostAsync(
+                    "/api/PaymentType",
+                    new StringContent(CardToDeleteAsJson, Encoding.UTF8, "application/json")
+                );
+
+
+                var deleteResponse = await client.DeleteAsync($"/api/PaymentType/32");
+
+
+                string responseBody = await response.Content.ReadAsStringAsync();
+                var PaymentType = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+
+                /*
+                    ASSERT
+                */
+                Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+
             }
         }
     }
