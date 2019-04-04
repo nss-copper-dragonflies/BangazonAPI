@@ -204,7 +204,7 @@ namespace TestBangazonAPI
                     new StringContent(CardToDeleteAsJson, Encoding.UTF8, "application/json")
                 );
                 int cardToDelete = CardToDelete.id;
-                var deleteResponse = await client.DeleteAsync($"/api/PaymentType/12");
+                var deleteResponse = await client.DeleteAsync($"/api/PaymentType/15");
 
 
                 string responseBody = await response.Content.ReadAsStringAsync();
