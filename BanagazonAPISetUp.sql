@@ -102,3 +102,26 @@ SELECT * FROM PaymentType;
 SELECT * FROM [Order];
 SELECT * FROM ProductType;
 
+select department.[Name], employee.Id, employee.FirstName, employee.LastName, employee.DepartmentId 
+from Department left join employee on Department.Id = employee.DepartmentId
+
+delete from Department where id = 5;
+delete from Department where id = 6;
+delete from Department where id = 7;
+delete from Department where id = 8;
+delete from Department where id = 9;
+delete from Department where id = 10;
+SELECT * FROM ProductType;
+
+select  department.id as Departmentid, 
+                                                    department.[Name] as departmentName, 
+                                                    department.budget, 
+                                                    employee.Id as employeeId, 
+                                                    employee.FirstName, 
+                                                    employee.LastName,
+                                                    employee.isSupervisor,
+                                                    employee.DepartmentId 
+                                            from Department 
+                                            left join employee on Department.Id = employee.DepartmentId
+				
+											where department.Id = 1;
