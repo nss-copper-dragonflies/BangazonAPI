@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 //Author: Brittany Ramos-Janeway
 //Declaration of the Employee class
 
@@ -17,5 +18,6 @@ namespace BangazonAPI.Models
         public int DepartmentId { get; set; }
         public Department Department { get; set; }
         public Computer Computer { get; set; } = new Computer();
+
     }
 }

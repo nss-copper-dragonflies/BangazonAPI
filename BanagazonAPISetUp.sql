@@ -99,3 +99,4 @@ SELECT * FROM EmployeeTraining;
 SELECT * FROM Product;
 SELECT * FROM PaymentType;
 SELECT * FROM [Order];
+SELECT * FROM ProductType;
