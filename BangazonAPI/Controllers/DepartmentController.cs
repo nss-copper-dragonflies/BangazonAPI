@@ -91,10 +91,10 @@ namespace BangazonAPI.Controllers
                                 currentDepartment.employeeList.Add(
                                    new Employee
                                    {
-                                       id = reader.GetInt32(reader.GetOrdinal("employeeId")),
+                                       Id = reader.GetInt32(reader.GetOrdinal("employeeId")),
                                        FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                                        LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                                       isSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor")),
+                                       IsSupervisor = reader.GetBoolean(reader.GetOrdinal("isSupervisor")),
                                        DepartmentId = reader.GetInt32(reader.GetOrdinal("departmentId"))
 
                                    }
