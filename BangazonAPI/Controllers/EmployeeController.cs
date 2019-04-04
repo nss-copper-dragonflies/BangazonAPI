@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
+//Author: Brittany Ramos-Janeway
+//Function: Performs the GET single, GET all, POST, and PUT for the Employee Resource
+
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -30,7 +33,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // Gets all employees from the database
+        // Gets all employees from the database and their corresponding department and computer information
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -41,9 +44,13 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"SELECT e.Id, e.FirstName, 
                                             e.LastName, e.IsSupervisor, 
-                                            e.DepartmentId, d.[Name]
-                                        FROM Employee e INNER JOIN Department d 
-                                            ON  e.DepartmentId = d.Id";
+                                            e.DepartmentId, d.[Name], d.Budget, 
+                                            c.Id AS ComputerId, c.Make, c.Manufacturer, 
+                                            c.PurchaseDate, c.DecomissionDate
+                                        FROM Employee e 
+		                                    INNER JOIN Department d ON  e.DepartmentId = d.Id
+		                                    INNER JOIN ComputerEmployee o ON e.Id = o.EmployeeId
+		                                    INNER JOIN Computer c ON o.ComputerId = c.Id";
                     SqlDataReader reader = cmd.ExecuteReader();
 
                     List<Employee> employees = new List<Employee>();
@@ -57,11 +64,31 @@ namespace BangazonAPI.Controllers
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                            //Department = new Department
-                            //{
-                                //waiting for info
-                            //}
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            Department = new Department
+                            {
+                                id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            }
                         };
+
+                        //must check to see if a computer is assigned to an employee
+                        if (!reader.IsDBNull(reader.GetOrdinal("ComputerId")))
+                        {
+                            employee.Computer = new Computer
+                            {
+                                id = reader.GetInt32(reader.GetOrdinal("ComputerId")),
+                                purchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                                //must first check whether the decomission date returns null, then return accordingly
+                                DecommisionDate = reader.IsDBNull(reader.GetOrdinal("DecomissionDate"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                            };
+                        }
+                            
                         employees.Add(employee);
                     }
                     reader.Close();
@@ -71,8 +98,8 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // GET: api/Employee/5
-        [HttpGet("{id}", Name = "Get")]
+        // Gets an individual employee and their corresponding department and computer information
+        [HttpGet("{id}", Name = "GetEmployee")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             using (SqlConnection conn = Connection)
@@ -82,10 +109,13 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"SELECT e.Id, e.FirstName, 
                                             e.LastName, e.IsSupervisor, 
-                                            e.DepartmentId, d.[Name]
-                                        FROM Employee e INNER JOIN Department d 
-                                            ON  e.DepartmentId = d.Id
-                                        WHERE Id = @id";
+                                            e.DepartmentId, d.[Name], d.Budget, 
+                                            c.Id AS ComputerId, c.Make, c.Manufacturer, 
+                                            c.PurchaseDate, c.DecomissionDate
+                                        FROM Employee e 
+		                                    INNER JOIN Department d ON  e.DepartmentId = d.Id
+		                                    INNER JOIN ComputerEmployee o ON e.Id = o.EmployeeId
+		                                    INNER JOIN Computer c ON o.ComputerId = c.Id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -99,11 +129,29 @@ namespace BangazonAPI.Controllers
                             FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             LastName = reader.GetString(reader.GetOrdinal("LastName")),
                             IsSupervisor = reader.GetBoolean(reader.GetOrdinal("IsSupervisor")),
-                            //Department = new Department
-                            //{
-                            //waiting for info
-                            //}
+                            DepartmentId = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                            Department = new Department
+                            {
+                                id = reader.GetInt32(reader.GetOrdinal("DepartmentId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                Budget = reader.GetInt32(reader.GetOrdinal("Budget"))
+                            }
                         };
+                        if (!reader.IsDBNull(reader.GetOrdinal("ComputerId")))
+                        {
+                            employee.Computer = new Computer
+                            {
+                                id = reader.GetInt32(reader.GetOrdinal("ComputerId")),
+                                purchaseDate = reader.GetDateTime(reader.GetOrdinal("PurchaseDate")),
+                                //must first check whether the decomission date returns null, then return accordingly
+                                DecommisionDate = reader.IsDBNull(reader.GetOrdinal("DecomissionDate"))
+                                    ? (DateTime?)null
+                                    : reader.GetDateTime(reader.GetOrdinal("DecomissionDate")),
+                                Make = reader.GetString(reader.GetOrdinal("Make")),
+                                Manufacturer = reader.GetString(reader.GetOrdinal("Manufacturer"))
+                            };
+                        }
+                   
                     }
                     reader.Close();
 
@@ -112,22 +160,93 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // POST: api/Employee
+        // Posts a new employee to the database
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Post([FromBody] Employee employee)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Employee 
+                                            (FirstName, LastName, 
+                                            IsSupervisor, DepartmentId)
+                                        OUTPUT INSERTED.Id
+                                        VALUES (@FirstName, @LastName, 
+                                            @IsSupervisor, @DepartmentId)";
+                    cmd.Parameters.Add(new SqlParameter("@FirstName", employee.FirstName));
+                    cmd.Parameters.Add(new SqlParameter("@LastName", employee.LastName));
+                    cmd.Parameters.Add(new SqlParameter("@IsSupervisor", employee.IsSupervisor));
+                    cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
+
+                    int newId = (int)cmd.ExecuteScalar();
+                    employee.Id = newId;
+                    return CreatedAtRoute(new { id = newId }, employee);
+                }
+            }
         }
 
         // PUT: api/Employee/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Employee employee)
         {
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
+                        cmd.CommandText = @"UPDATE Employee
+                                            SET FirstName = @FirstName,
+                                                LastName = @LastName,
+                                                IsSupervisor = @IsSupervisor,
+                                                DepartmentId = @DepartmentId";
+                        cmd.Parameters.Add(new SqlParameter("@FirstName", employee.FirstName));
+                        cmd.Parameters.Add(new SqlParameter("@LastName", employee.LastName));
+                        cmd.Parameters.Add(new SqlParameter("@IsSupervisor", employee.IsSupervisor));
+                        cmd.Parameters.Add(new SqlParameter("@DepartmentId", employee.DepartmentId));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!EmployeeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
         }
 
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        private bool EmployeeExists(int id)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @" SELECT Id, FirstName, LastName, 
+                                            IsSupervisor, DepartmentId
+                                        FROM Employee
+                                        WHERE Id = @id";
+                    cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    return reader.Read();
+                }
+            }
         }
     }
 }

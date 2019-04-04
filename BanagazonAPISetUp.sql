@@ -77,7 +77,7 @@ INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (1038, 'Visa', 3
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (2741, 'PayPal', 4);
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (1719, 'Visa', 5);
 
-INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, 2);
+INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, NULL);
 INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (2, 3);
 INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (3, 4);
 INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (4, 5);
@@ -96,7 +96,6 @@ SELECT * FROM Computer;
 SELECT * FROM TrainingProgram;
 SELECT * FROM ComputerEmployee;
 SELECT * FROM EmployeeTraining;
-SELECT * FROM Customer;
 SELECT * FROM Product;
 SELECT * FROM PaymentType;
 SELECT * FROM [Order];
