@@ -165,7 +165,8 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"DELETE PaymentType Where id = @id";
+                    cmd.CommandText = @"delete from paymenttype where id = @id 
+                                        and not exists(select paymenttypeid from [order] where paymenttypeid = @id)";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     cmd.ExecuteNonQuery();

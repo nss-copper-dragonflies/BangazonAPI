@@ -125,3 +125,6 @@ select  department.id as Departmentid,
                                             left join employee on Department.Id = employee.DepartmentId
 				
 											where department.Id = 1;
+
+											delete from paymenttype where id = 2 
+                                        and not exists(select paymenttypeid from [order] where paymenttypeid = 2);
