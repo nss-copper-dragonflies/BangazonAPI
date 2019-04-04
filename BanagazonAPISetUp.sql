@@ -70,7 +70,7 @@ INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Qua
 INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 5, 150, 'Apple Bottom Jeans', 'Pair with fur boots', 3);
 INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, [Description], Quantity) VALUES (3, 5, 200, 'Boots with the Fur', 'Pair with apple bottom jeans', 20);
 
-INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (8321, 'American Express', 1);
+INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (8321, 'American Express', 2);
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (4362, 'Visa', 1);
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (1362, 'Mastercard', 2);
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (1038, 'Visa', 3);
