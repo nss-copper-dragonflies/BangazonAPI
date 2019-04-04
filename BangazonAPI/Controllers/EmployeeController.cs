@@ -187,7 +187,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        // PUT: api/Employee/5
+        // Put method will modify existing employees
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Employee employee)
         {
@@ -230,6 +230,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
+        //catches attempts to modify employees that do not exist
         private bool EmployeeExists(int id)
         {
             using (SqlConnection conn = Connection)

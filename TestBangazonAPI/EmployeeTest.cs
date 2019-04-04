@@ -33,7 +33,7 @@ namespace TestBangazonAPI
             }
         }
 
-        //Get single customer test
+        //Get single employee test
         [Fact]
         public async Task Test_Get_Specific_Employee()
         {
@@ -48,7 +48,7 @@ namespace TestBangazonAPI
             }
         }
 
-        //Put method test
+        //Put employee test
         [Fact]
         public async Task Test_Modify_Employee()
         {
@@ -86,7 +86,7 @@ namespace TestBangazonAPI
             }
         }
 
-        //Post method test
+        //Post employee test
         [Fact]
         public async Task Test_Create_Employee()
         {

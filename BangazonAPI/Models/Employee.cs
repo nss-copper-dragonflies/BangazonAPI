@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 //Author: Brittany Ramos-Janeway
+//Declaration of the Employee class
 
 namespace BangazonAPI.Models
 {
