@@ -100,27 +100,28 @@ SELECT * FROM Customer;
 SELECT * FROM Product;
 SELECT * FROM PaymentType;
 SELECT * FROM [Order];
-<<<<<<< HEAD
-<<<<<<< HEAD
 SELECT * FROM ProductType;
 
 select department.[Name], employee.Id, employee.FirstName, employee.LastName, employee.DepartmentId 
 from Department left join employee on Department.Id = employee.DepartmentId
 
-delete from employee where id = 9;
-delete from employee where id = 10;
-delete from employee where id = 11;
-delete from employee where id = 12;
-delete from employee where id = 13;
-delete from employee where id = 14;
-delete from employee where id = 15;
-delete from employee where id = 16;
-delete from employee where id = 17;
-delete from employee where id = 18;
-delete from employee where id = 19;
-delete from employee where id = 20;
-delete from employee where id = 21;
-delete from employee where id = 22;
-delete from employee where id = 23;
-delete from employee where id = 24;
+delete from Department where id = 5;
+delete from Department where id = 6;
+delete from Department where id = 7;
+delete from Department where id = 8;
+delete from Department where id = 9;
+delete from Department where id = 10;
 SELECT * FROM ProductType;
+
+select  department.id as Departmentid, 
+                                                    department.[Name] as departmentName, 
+                                                    department.budget, 
+                                                    employee.Id as employeeId, 
+                                                    employee.FirstName, 
+                                                    employee.LastName,
+                                                    employee.isSupervisor,
+                                                    employee.DepartmentId 
+                                            from Department 
+                                            left join employee on Department.Id = employee.DepartmentId
+				
+											where department.Id = 1;

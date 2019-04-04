@@ -37,7 +37,7 @@ namespace TestBangazonAPI
             using (var client = new APIClientProvider().Client)
             {
                 
-                var specific_Department = await client.GetAsync("api/Department/1");
+                var specific_Department = await client.GetAsync("api/Department/3");
                 
                 string responseBody = await specific_Department.Content.ReadAsStringAsync();
                 
@@ -45,7 +45,7 @@ namespace TestBangazonAPI
 
 
                 Assert.Equal(HttpStatusCode.OK, specific_Department.StatusCode);
-                Assert.Equal("Gardening", specific_Dept_res.Name);
+                Assert.Equal("Animal Control", specific_Dept_res.Name);
             }
         }
         [Fact]
@@ -86,7 +86,7 @@ namespace TestBangazonAPI
         {
             using (var client = new APIClientProvider().Client)
             {
-                //need to get to api/ProductType to get all available product types.
+                //need to get to api/department to get all available product types.
                 var departmentResponse = await client.GetAsync("api/Department");
 
                 string responseBody = await departmentResponse.Content.ReadAsStringAsync();
@@ -97,7 +97,7 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.OK, departmentResponse.StatusCode);
                 Assert.True(departmentList.Count > 0);
 
-                //Pick an object from the list of the ProductTypes and assign the name of that object to a variable to use for later
+                //Pick an object from the list of the department and assign the name of that object to a variable to use for later
                 var departmentObject = departmentList[0];
                 var defaultDepartmentName = departmentObject.Name;
 
@@ -119,7 +119,7 @@ namespace TestBangazonAPI
                 //Get by Id and verify that the Name was indeed changed.
 
                 var specificDepartment= await client.GetAsync($"api/Department/{departmentObject.id}");
-                //wait until specific_PT is complete then read that response as a string
+                //wait until specificDepartment is complete then read that response as a string
                 string modDepartmentResponseBody = await specificDepartment.Content.ReadAsStringAsync();
                 //Then we convert the json into something that C# can read and create a list of all of the payment types
                 var departmentRes = JsonConvert.DeserializeObject<Department>(modDepartmentResponseBody);
@@ -127,16 +127,16 @@ namespace TestBangazonAPI
                 Assert.Equal(HttpStatusCode.OK, specificDepartment.StatusCode);
                 Assert.Equal("Wax", departmentRes.Name);
 
-                //set obj back to original value by doing another put
+                
                 departmentRes.Name = defaultDepartmentName;
-                var originalProductTypeJson = JsonConvert.SerializeObject(departmentObject);
+                var originalDepartmentJson = JsonConvert.SerializeObject(departmentObject);
 
-                //need to use the client to send the request and store the response
+                
                 var originalResponse = await client.PutAsync(
                     $"/api/Department/{departmentObject.id}",
-                    new StringContent(departmentObject, Encoding.UTF8, "application/json")
+                    new StringContent(departmentJson, Encoding.UTF8, "application/json")
                 );
-                string originalProductTypeObject = await response.Content.ReadAsStringAsync();
+                string originalDepartmentTypeObject = await response.Content.ReadAsStringAsync();
 
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             }

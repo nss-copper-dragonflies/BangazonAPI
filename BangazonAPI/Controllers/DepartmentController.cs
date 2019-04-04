@@ -7,7 +7,7 @@ using BangazonAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-
+//JORDAN ROSAS: Controller for the Get, Get single, put and post working with query strings and q='s
 namespace BangazonAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -135,7 +135,7 @@ namespace BangazonAPI.Controllers
                     else
                     {
                         cmd.CommandText = @"select department.id as Departmentid, department.[name] as departmentName, department.budget
-                                            From department";
+                                            From department Where department.id = @id";
                                             
                     }
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -217,8 +217,8 @@ namespace BangazonAPI.Controllers
                                             SET [Name] = @name,
                                                 Budget = @budget
                                             WHERE id = @id";
-                    cmd.Parameters.Add(new SqlParameter("@FirstName", updatedDepartment.Name));
-                    cmd.Parameters.Add(new SqlParameter("@LastName", updatedDepartment.Budget));
+                    cmd.Parameters.Add(new SqlParameter("@name", updatedDepartment.Name));
+                    cmd.Parameters.Add(new SqlParameter("@budget", updatedDepartment.Budget));
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
                     cmd.ExecuteNonQuery();
