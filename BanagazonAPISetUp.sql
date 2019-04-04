@@ -77,7 +77,7 @@ INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (1038, 'Visa', 3
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (2741, 'PayPal', 4);
 INSERT INTO PaymentType (AcctNumber, [Name], CustomerId) VALUES (1719, 'Visa', 5);
 
-INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, 2);
+INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, NULL);
 INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (2, 3);
 INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (3, 4);
 INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (4, 5);
@@ -96,32 +96,7 @@ SELECT * FROM Computer;
 SELECT * FROM TrainingProgram;
 SELECT * FROM ComputerEmployee;
 SELECT * FROM EmployeeTraining;
-SELECT * FROM Customer;
 SELECT * FROM Product;
 SELECT * FROM PaymentType;
 SELECT * FROM [Order];
 SELECT * FROM ProductType;
-
-select department.[Name], employee.Id, employee.FirstName, employee.LastName, employee.DepartmentId 
-from Department left join employee on Department.Id = employee.DepartmentId
-
-delete from Department where id = 5;
-delete from Department where id = 6;
-delete from Department where id = 7;
-delete from Department where id = 8;
-delete from Department where id = 9;
-delete from Department where id = 10;
-SELECT * FROM ProductType;
-
-select  department.id as Departmentid, 
-                                                    department.[Name] as departmentName, 
-                                                    department.budget, 
-                                                    employee.Id as employeeId, 
-                                                    employee.FirstName, 
-                                                    employee.LastName,
-                                                    employee.isSupervisor,
-                                                    employee.DepartmentId 
-                                            from Department 
-                                            left join employee on Department.Id = employee.DepartmentId
-				
-											where department.Id = 1;
